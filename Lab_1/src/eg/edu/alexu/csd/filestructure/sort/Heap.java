@@ -10,6 +10,7 @@ public class Heap<T extends Comparable<T>> implements IHeap<T> {
 
     public Heap() {
         arr = new ArrayList<>();
+        arr.add(null);
     }
 
     @Override

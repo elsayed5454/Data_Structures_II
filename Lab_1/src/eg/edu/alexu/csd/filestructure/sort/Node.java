@@ -3,7 +3,7 @@ package eg.edu.alexu.csd.filestructure.sort;
 
 public class Node<T extends Comparable<T>> implements INode<T> {
 
-    private Integer index;
+    private Integer index = 1;
 
     public Node(int newIndex) { index = newIndex; }
 
