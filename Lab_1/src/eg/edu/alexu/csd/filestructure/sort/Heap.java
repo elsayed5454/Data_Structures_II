@@ -4,19 +4,19 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
-public class Heap implements IHeap {
+public class Heap<T extends Comparable<T>> implements IHeap<T> {
 
-    private ArrayList<Comparable> arr;
+    private ArrayList<T> arr;
 
     public Heap() {
         arr = new ArrayList<>();
     }
 
     @Override
-    public INode getRoot() {
+    public INode<T> getRoot() {
 
         // The tree is 1 indexed
-        return new Node(1);
+        return new Node<>( 1);
     }
 
     @Override
@@ -25,10 +25,10 @@ public class Heap implements IHeap {
     }
 
     @Override
-    public void heapify(INode node) {
+    public void heapify(INode<T> node) {
 
         // Getting left child index and right child index
-        int index = (int)node.getValue();
+        int index = (int)(Object)node.getValue();
         int leftIndex = index * 2;
         int rightIndex = index * 2 + 1;
 
@@ -46,16 +46,16 @@ public class Heap implements IHeap {
         // Swapping the maximum element with the parent element
         if(max != index) {
             Collections.swap(arr, index, max);
-            heapify(new Node(max));
+            heapify(new Node<>(max));
         }
     }
 
     @Override
-    public Comparable extract() {
+    public T extract() {
 
         // Swapping the root and the last element in the tree
         Collections.swap(arr, 1, size() - 1);
-        Comparable root = arr.get(size() - 1);
+        T root = arr.get(size() - 1);
 
         // Removing the last element then heapify the tree
         arr.remove(size() - 1);
@@ -64,19 +64,20 @@ public class Heap implements IHeap {
     }
 
     @Override
-    public void insert(Comparable element) {
+    public void insert(T element) {
 
         // Add the element to the tree then heapify it
         arr.add(element);
-        heapify(new Node(size() - 1));
+        Collections.swap(arr, 1, size() - 1);
+        heapify(getRoot());
     }
 
     @Override
-    public void build(Collection unordered) {
+    public void build(Collection<T> unordered) {
 
         arr = new ArrayList<>(unordered);
         for(int i = (size() - 1) / 2; i >= 1; i--) {
-            heapify(new Node(i));
+            heapify(new Node<>(i));
         }
     }
 
