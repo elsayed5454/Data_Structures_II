@@ -3,29 +3,48 @@ package eg.edu.alexu.csd.filestructure.sort;
 
 public class Node<T extends Comparable<T>> implements INode<T> {
 
-    private Integer index = 1;
+    private T value;
+    private INode<T> parent, leftChild, rightChild;
 
-    public Node(int newIndex) { index = newIndex; }
+    public Node(T newValue, INode<T> newParent, INode<T> newLeftChild, INode<T> newRightChild) {
+        value = newValue;
+        parent = newParent;
+        leftChild = newLeftChild;
+        rightChild = newRightChild;
+    }
+
+    public Node(T newValue, INode<T> newParent) {
+        new Node<T>(newValue, newParent, null, null);
+    }
+
+    public Node(T newValue, INode<T> newParent, INode<T> newLeftChild) {
+        new Node<T>(newValue, newParent, newLeftChild, null);
+    }
+
 
     @Override
-    public INode<T> getLeftChild() { return new Node<T>( index * 2); }
+    public INode<T> getLeftChild() {
+        return leftChild;
+    }
 
     @Override
     public INode<T> getRightChild() {
-        return new Node<T>(index * 2 + 1);
+        return rightChild;
     }
 
     @Override
     public INode<T> getParent() {
-        return new Node<T>(index / 2);
+        return parent;
     }
 
     @Override
-    public T getValue() { return (T) index; }
+    public T getValue() {
+        return value;
+    }
 
     @Override
-    public void setValue(T value) {
-        index = (int) (Object)value;
+    public void setValue(T newValue) {
+        value = newValue;
     }
 
 }
