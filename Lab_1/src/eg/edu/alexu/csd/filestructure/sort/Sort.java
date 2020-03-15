@@ -17,15 +17,16 @@ public class Sort<T extends Comparable<T>> implements ISort<T>{
 
     @Override
     public void sortSlow(ArrayList<T> unordered) {
+        if(unordered!=null) {
+            // Bubble sort
+            int n = unordered.size();
+            for (int i = 0; i < n - 1; i++) {
+                for (int j = 0; j < n - i - 1; j++) {
+                    if (unordered.get(j).compareTo(unordered.get(j + 1)) > 0) {
 
-        // Bubble sort
-        int n = unordered.size();
-        for (int i = 0; i < n-1; i++) {
-            for (int j = 0; j < n-i-1; j++) {
-                if (unordered.get(j).compareTo(unordered.get(j + 1)) > 0) {
-
-                    // Swap index j and j + 1
-                    Collections.swap(unordered, j, j + 1);
+                        // Swap index j and j + 1
+                        Collections.swap(unordered, j, j + 1);
+                    }
                 }
             }
         }
