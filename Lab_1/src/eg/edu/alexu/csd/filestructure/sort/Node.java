@@ -5,7 +5,6 @@ public class Node<T extends Comparable<T>> implements INode<T> {
 
     private T value;
     private INode<T> parent, leftChild, rightChild;
-    int hi=0;
 
     public Node(T newValue, INode<T> newParent, INode<T> newLeftChild, INode<T> newRightChild) {
 
@@ -15,14 +14,17 @@ public class Node<T extends Comparable<T>> implements INode<T> {
         rightChild = newRightChild;
     }
 
-    public Node(T newValue, INode<T> newParent) {
-        new Node<T>(newValue, newParent, null, null);
-    }
     public Node(T newValue) {
-        new Node<T>(newValue, null, null, null);
+        this(newValue, null, null, null);
     }
+
+    public Node(T newValue, INode<T> newParent) {
+        this(newValue, newParent, null, null);
+    }
+
+
     public Node(T newValue, INode<T> newParent, INode<T> newLeftChild) {
-        new Node<T>(newValue, newParent, newLeftChild, null);
+        this(newValue, newParent, newLeftChild, null);
     }
 
 
@@ -49,6 +51,18 @@ public class Node<T extends Comparable<T>> implements INode<T> {
     @Override
     public void setValue(T newValue) {
         value = newValue;
+    }
+
+    public void setParent(INode<T> newParent) {
+        parent = newParent;
+    }
+
+    public void setLeftChild(INode<T> newLeftChild) {
+        leftChild = newLeftChild;
+    }
+
+    public void setRightChild(INode<T> newRightChild) {
+        rightChild = newRightChild;
     }
 
 }

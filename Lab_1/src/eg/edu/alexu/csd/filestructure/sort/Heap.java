@@ -2,57 +2,54 @@ package eg.edu.alexu.csd.filestructure.sort;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 
 public class Heap<T extends Comparable<T>> implements IHeap<T> {
 
-    private ArrayList<INode<T>> arr;
-    int heapSize;
-    int counter =0;
+    private ArrayList<Node<T>> arr;
+
     public Heap() {
 
         arr = new ArrayList<>();
-        heapSize=0;
     }
 
     @Override
     public INode<T> getRoot() {
 
-        return arr.get(0);
+        if (size() != 0) {
+            return arr.get(0);
+        }
+        return null;
     }
 
     @Override
     public int size() {
-        return heapSize;
+        return arr.size();
     }
 
     @Override
     public void heapify(INode<T> node) {
 
+        if (node == null) {
+            return;
+        }
+
         // Getting left child and right child
         INode<T> leftChild = node.getLeftChild();
         INode<T> rightChild = node.getRightChild();
-        counter++;
 
         // Assigning the node value as the node with largest element
         INode<T> maxNode = node;
 
-
         // Comparing the left and right children nodes to the parent
-        if (leftChild != null ) {
-            System.out.println(counter+"   leftchild   "+leftChild.getValue() );
-            if( leftChild.getValue().compareTo(maxNode.getValue()) > 0) {
+        if (leftChild != null) {
+            if (leftChild.getValue().compareTo(maxNode.getValue()) > 0) {
                 maxNode = leftChild;
-
             }
         }
-        if (rightChild != null ) {
-            System.out.println(counter+"   rightchild   "+rightChild.getValue() );
-            if(rightChild.getValue()!=null) {
-                if (rightChild.getValue().compareTo(maxNode.getValue()) > 0) {
-                    maxNode = rightChild;
 
-                }
+        if (rightChild != null) {
+            if (rightChild.getValue().compareTo(maxNode.getValue()) > 0) {
+                maxNode = rightChild;
             }
         }
 
@@ -67,117 +64,119 @@ public class Heap<T extends Comparable<T>> implements IHeap<T> {
 
     @Override
     public T extract() {
-        if(!arr.isEmpty()) {
-            System.out.println("extract");
-            // Swapping the root and the last element in the tree
-            T temp = getRoot().getValue();
-            if(getRoot()==null){System.out.println("nulllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll");}
-            getRoot().setValue(arr.get(heapSize - 1).getValue());
-            arr.get(heapSize - 1).setValue(temp);
-            if (heapSize > 1) {
-                if ((heapSize - 1) % 2 == 0) {
-                    Node<T> nod= new Node<T>(arr.get((heapSize - 2)/2).getValue(), arr.get(((heapSize - 2)/2)/2), arr.get((heapSize - 2)/2).getLeftChild());
-                    nod.setValue(arr.get((heapSize - 2)/2).getValue());
-                    arr.set((heapSize - 2) / 2,nod);
-                } else {
-                    Node<T> nodt=new Node<T>(arr.get((heapSize - 1)/2).getValue(), arr.get(((heapSize - 1)/2)/2));
-                    nodt.setValue(arr.get((heapSize - 1)/2).getValue());
-                    arr.set((heapSize - 1) / 2,nodt);
-                }
-            }
-            heapSize = heapSize - 1;
-            // Removing the last element then heapify the tree
-            heapify(getRoot());
-            if(counter>0){
-                counter=0;
-            }
-            System.out.println("root after extract heapify"+getRoot().getValue());
-            return temp;
-        }
-        else {
+
+        if (arr.isEmpty()) {
             return null;
         }
+
+        // Swapping the root value and the last node value
+        T rootValue = getRoot().getValue();
+        T tmp = arr.get(size() - 1).getValue();
+        getRoot().setValue(tmp);
+
+        // Setting the removed child to null in parent node
+        Node<T> parent = (Node<T>) arr.get(size() - 1).getParent();
+
+        // If the removed node is the root
+        if (parent != null) {
+
+            if (parent.getRightChild() != null) {
+                parent.setRightChild(null);
+
+            } else {
+                parent.setLeftChild(null);
+            }
+        }
+
+        // Removing the last node then heapify the tree
+        arr.remove(size() - 1);
+        heapify(getRoot());
+
+        return rootValue;
     }
 
     @Override
     public void insert(T element) {
-        System.out.println(element);
-        Node newNode;
-        System.out.println("array size"+arr.size()+"heap size"+heapSize);
 
-        if((arr.size()==0||heapSize==0)&&!(arr.size()<0)){
-            newNode = new Node<T>(element);
-            newNode.setValue(element);
+        if (element == null) {
+            return;
         }
-        else {
-            newNode = new Node<T>(element, arr.get(heapSize - 1));
-            newNode.setValue(element);
-        }
-        arr.add(heapSize,newNode);
-        if(heapSize>=1) {
-            if ((heapSize - 1) % 2 == 0) {
 
-                Node<T> tmp = new Node<T>(arr.get(heapSize / 2).getValue(), arr.get(heapSize / 2).getParent(), newNode);
-                tmp.setValue(arr.get(heapSize / 2).getValue());
-                arr.set(heapSize / 2, tmp);
+        Node<T> newNode = new Node<>(element);
+        arr.add(newNode);
 
+        // If the new node is not the only node
+        if (size() != 1) {
+
+            // Setting links between new node and its parent
+            int i = size() - 1;
+            Node<T> parent = arr.get((i - 1) / 2);
+            newNode.setParent(parent);
+            if (parent.getLeftChild() == null) {
+                parent.setLeftChild(newNode);
             } else {
-                Node<T> tmpt = new Node<T>(arr.get(heapSize / 2).getValue(), arr.get(heapSize / 2).getParent(), arr.get(heapSize / 2).getLeftChild(), newNode);
-                tmpt.setValue(arr.get(heapSize / 2).getValue());
-                arr.set(heapSize / 2, tmpt);
+                parent.setRightChild(newNode);
+            }
+
+            // Swapping new node value with parent value
+            Node<T> node = newNode;
+            while (parent != null && node.getValue().compareTo(parent.getValue()) > 0) {
+
+                T tmp = parent.getValue();
+                parent.setValue(node.getValue());
+                node.setValue(tmp);
+
+                node = parent;
+                parent = (Node<T>) parent.getParent();
             }
         }
-        heapSize=heapSize+1;
-        heapify(getRoot());
-        if(counter>0){
-            counter=0;
-        }
-        System.out.println("root after insert heapify"+getRoot().getValue());
     }
 
     @Override
     public void build(Collection<T> unordered) {
-        if(unordered!=null&&!unordered.isEmpty()) {
-            ArrayList<T> temp = new ArrayList<>(unordered);
-            INode<T> root = createNode(temp, 0);
-            arr.add(root);
 
-            int i = 0;
-            while (i < temp.size()) {
+        if (unordered == null || unordered.isEmpty()) {
+            return;
+        }
 
-                INode<T> parent = arr.get(i);
-                if (parent.getLeftChild() != null) {
-                    arr.add(parent.getLeftChild());
-                }
-                if (parent.getRightChild() != null) {
-                    arr.add(parent.getRightChild());
-                }
-                i++;
+        ArrayList<T> unorder = new ArrayList<>(unordered);
+
+        for (T t : unorder) {
+            arr.add(new Node<>(t));
+        }
+
+        for (int i = 0; i < arr.size(); i++) {
+
+            if (i * 2 + 1 < arr.size()) {
+                arr.get(i).setLeftChild(arr.get(i * 2 + 1));
             }
-            if(!arr.isEmpty()) {
-                for (i = (size() - 1) / 2; i >= 0; i--) {
-                    heapify(arr.get(i));
-                }
+            if (i * 2 + 2 < arr.size()) {
+                arr.get(i).setRightChild(arr.get(i * 2 + 2));
+            }
+            if (i != 0) {
+                arr.get(i).setParent(arr.get((i - 1) / 2));
+            }
+        }
+
+        if (!arr.isEmpty()) {
+            for (int i = (arr.size() - 1) / 2; i >= 0; i--) {
+                heapify(arr.get(i));
             }
         }
     }
 
-    private INode<T> createNode(ArrayList<T> unordered, int index) {
-
-        // Check if index is out of bounds
-        if(index >= unordered.size()) {
-            return null;
-        }
-
-        // Create nodes recursively
-        if(index == 0) {
-            return new Node<>(unordered.get(index), null, createNode(unordered, index * 2 + 1),
-                    createNode(unordered, index * 2 + 2));
-        }
-        else {
-            return new Node<>(unordered.get(index), createNode(unordered, (index - 1) / 2),
-                    createNode(unordered, index * 2+1 ), createNode(unordered, index * 2 + 2));
-        }
+    // Driver program
+    public static void main(String[] args) {
+        int[] arr = {12, 11, 13, 5, 6, 7};
+        ArrayList<Integer> arr2 = new ArrayList<>();
+        arr2.add(12);
+        arr2.add(11);
+        arr2.add(13);
+        arr2.add(5);
+        arr2.add(6);
+        arr2.add(7);
+        IHeap heap = new Heap<>();
+        heap.build(arr2);
     }
 
 }
