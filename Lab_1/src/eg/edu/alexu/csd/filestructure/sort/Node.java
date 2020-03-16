@@ -4,10 +4,11 @@ package eg.edu.alexu.csd.filestructure.sort;
 public class Node<T extends Comparable<T>> implements INode<T> {
 
     private T value;
-    public int index;
     private INode<T> parent, leftChild, rightChild;
+    int hi=0;
 
     public Node(T newValue, INode<T> newParent, INode<T> newLeftChild, INode<T> newRightChild) {
+
         value = newValue;
         parent = newParent;
         leftChild = newLeftChild;
