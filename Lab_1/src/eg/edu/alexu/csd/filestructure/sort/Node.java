@@ -18,16 +18,6 @@ public class Node<T extends Comparable<T>> implements INode<T> {
         this(newValue, null, null, null);
     }
 
-    public Node(T newValue, INode<T> newParent) {
-        this(newValue, newParent, null, null);
-    }
-
-
-    public Node(T newValue, INode<T> newParent, INode<T> newLeftChild) {
-        this(newValue, newParent, newLeftChild, null);
-    }
-
-
     @Override
     public INode<T> getLeftChild() {
         return leftChild;

@@ -165,18 +165,8 @@ public class Heap<T extends Comparable<T>> implements IHeap<T> {
         }
     }
 
-    // Driver program
-    public static void main(String[] args) {
-        int[] arr = {12, 11, 13, 5, 6, 7};
-        ArrayList<Integer> arr2 = new ArrayList<>();
-        arr2.add(12);
-        arr2.add(11);
-        arr2.add(13);
-        arr2.add(5);
-        arr2.add(6);
-        arr2.add(7);
-        IHeap heap = new Heap<>();
-        heap.build(arr2);
+    public ArrayList<Node<T>> getArr() {
+        return arr;
     }
 
 }
