@@ -39,9 +39,102 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
     public boolean contains(T key) {
         return findNode(root, key) != null;
     }
+    INode<T, V> bsearch(T key){
+        INode<T, V> temp=root;
+        while (temp != null) {
+            if (key.compareTo(temp.getKey()) < 0) {
+                if (temp.getLeftChild()== null)
+                    break;
+                else
+                    temp = temp.getLeftChild();
+            } else if (key == temp.getKey()) {
+                break;
+            } else {
+                if (temp.getRightChild() == null)
+                    break;
+                else
+                    temp = temp.getRightChild();
+            }
+        }
+        return temp;
+    }
+    void fixRedRed(INode<T, V> x){
+        if(x==root){
+            x.setColor(false);
+            return;
+        }
+        INode<T, V> p=x.getParent(), g=x.getParent().getParent(),u=null;
+        if(g!=null){
+            if(g.getLeftChild()==p){
+                u=g.getRightChild();
+            }
+            else{
+                u=g.getLeftChild();
+            }
+        }
+        if(p.getColor()!=INode.BLACK){
+            if(u!=null&&u.getColor()==INode.RED){
+                p.setColor(INode.BLACK);
+                u.setColor(INode.BLACK);
+                g.setColor(INode.RED);
+                fixRedRed(g);
+            }
+            else{
+                if(isLeftChild(p)){
+                    ///leftleft
+                    if(isLeftChild(x)){
+                        p.setColor(INode.BLACK);
+                        g.setColor(INode.RED);
+                    }
+                    //leftright
+                    else{
+                        leftRotate(p);
+                        p.setColor(INode.BLACK);
+                        g.setColor(INode.RED);
+                    }
+                    rightRotate(g);
+                }
+                else{
+                    //rightleft
+                    if(isLeftChild(x)){
+                        rightRotate(p);
+                        p.setColor(INode.BLACK);
+                        g.setColor(INode.RED);
+                    }
+                    //rightright
+                    else{
+                        p.setColor(INode.BLACK);
+                        g.setColor(INode.RED);
+                    }
+                    leftRotate(g);
+                }
+            }
+        }
+    }
 
     @Override
     public void insert(T key, V value) {
+        INode<T, V> newNode= new Node(key,value);
+        if(root==null){
+            newNode.setColor(false);
+            root=newNode;
+        }
+        else{
+            INode<T, V> temp= bsearch(key);
+            //update value if key exists
+            if(temp.getKey()==key){
+                temp.setValue(value);
+                return;
+            }
+            newNode.setParent(temp);
+            if(key.compareTo(temp.getKey())<0){
+                temp.setLeftChild(newNode);
+            }
+            else{
+                temp.setRightChild(newNode);
+            }
+            fixRedRed(newNode);
+        }
 
     }
 
