@@ -7,6 +7,18 @@ public class Node<T extends Comparable<T>, V> implements INode<T, V> {
     private INode<T, V> parent, leftChild, rightChild;
     private boolean color;
 
+    public Node(T newKey, V newValue, INode<T, V> newParent, INode<T, V> newLeftChild, INode<T, V> newRightChild) {
+        key = newKey;
+        value = newValue;
+        parent = newParent;
+        leftChild = newLeftChild;
+        rightChild = newRightChild;
+    }
+
+    public Node(T newKey, V newValue) {
+        this(newKey, newValue, null, null, null);
+    }
+
     @Override
     public void setParent(INode<T, V> newParent) {
         parent = newParent;
