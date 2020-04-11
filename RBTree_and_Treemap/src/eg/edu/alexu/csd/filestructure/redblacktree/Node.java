@@ -74,7 +74,6 @@ public class Node<T extends Comparable<T>, V> implements INode<T, V> {
         color = newColor;
     }
 
-    // Todo
     @Override
     public boolean isNull() {
         return false;

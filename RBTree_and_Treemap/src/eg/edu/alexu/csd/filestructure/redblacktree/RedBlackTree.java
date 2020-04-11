@@ -1,5 +1,7 @@
 package eg.edu.alexu.csd.filestructure.redblacktree;
 
+import javax.management.RuntimeErrorException;
+
 public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T, V> {
 
     INode<T, V> root;
@@ -26,8 +28,12 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
     @Override
     public V search(T key) {
 
+        if (key == null) {
+            throw new RuntimeErrorException(new Error());
+        }
+
         INode<T, V> node = findNode(root, key);
-        if (node != null) {
+        if (node != null && node.getKey() == key) {
             return node.getValue();
         }
         else {
@@ -37,109 +43,53 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 
     @Override
     public boolean contains(T key) {
-        return findNode(root, key) != null;
-    }
-    INode<T, V> bsearch(T key){
-        INode<T, V> temp=root;
-        while (temp != null) {
-            if (key.compareTo(temp.getKey()) < 0) {
-                if (temp.getLeftChild()== null)
-                    break;
-                else
-                    temp = temp.getLeftChild();
-            } else if (key == temp.getKey()) {
-                break;
-            } else {
-                if (temp.getRightChild() == null)
-                    break;
-                else
-                    temp = temp.getRightChild();
-            }
+
+        if (key == null) {
+            throw new RuntimeErrorException(new Error());
         }
-        return temp;
-    }
-    void fixRedRed(INode<T, V> x){
-        if(x==root){
-            x.setColor(false);
-            return;
-        }
-        INode<T, V> p=x.getParent(), g=x.getParent().getParent(),u=null;
-        if(g!=null){
-            if(g.getLeftChild()==p){
-                u=g.getRightChild();
-            }
-            else{
-                u=g.getLeftChild();
-            }
-        }
-        if(p.getColor()!=INode.BLACK){
-            if(u!=null&&u.getColor()==INode.RED){
-                p.setColor(INode.BLACK);
-                u.setColor(INode.BLACK);
-                g.setColor(INode.RED);
-                fixRedRed(g);
-            }
-            else{
-                if(isLeftChild(p)){
-                    ///leftleft
-                    if(isLeftChild(x)){
-                        p.setColor(INode.BLACK);
-                        g.setColor(INode.RED);
-                    }
-                    //leftright
-                    else{
-                        leftRotate(p);
-                        p.setColor(INode.BLACK);
-                        g.setColor(INode.RED);
-                    }
-                    rightRotate(g);
-                }
-                else{
-                    //rightleft
-                    if(isLeftChild(x)){
-                        rightRotate(p);
-                        p.setColor(INode.BLACK);
-                        g.setColor(INode.RED);
-                    }
-                    //rightright
-                    else{
-                        p.setColor(INode.BLACK);
-                        g.setColor(INode.RED);
-                    }
-                    leftRotate(g);
-                }
-            }
-        }
+        INode<T, V> node = findNode(root, key);
+        return node != null && node.getKey() == key;
     }
 
     @Override
     public void insert(T key, V value) {
-        INode<T, V> newNode= new Node(key,value);
-        if(root==null){
-            newNode.setColor(false);
-            root=newNode;
+
+        if (key == null || value == null) {
+            throw new RuntimeErrorException(new Error());
         }
-        else{
-            INode<T, V> temp= bsearch(key);
-            //update value if key exists
-            if(temp.getKey()==key){
+
+        INode<T, V> newNode = new Node<>(key, value);
+
+        if (root == null) {
+            newNode.setColor(INode.BLACK);
+            root = newNode;
+        }
+        else {
+            INode<T, V> temp = findNode(root, key);
+
+            // Update value if key exists
+            if (temp.getKey() == key){
                 temp.setValue(value);
                 return;
             }
+
             newNode.setParent(temp);
-            if(key.compareTo(temp.getKey())<0){
+            if (key.compareTo(temp.getKey()) < 0) {
                 temp.setLeftChild(newNode);
             }
-            else{
+            else {
                 temp.setRightChild(newNode);
             }
-            fixRedRed(newNode);
+            redRed(newNode);
         }
-
     }
 
     @Override
     public boolean delete(T key) {
+
+        if (key == null) {
+            throw new RuntimeErrorException(new Error());
+        }
 
         // Check for node existence
         INode<T, V> node = findNode(root, key);
@@ -220,6 +170,51 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
         swap(node, nodeReplace);
         delete(nodeReplace.getKey());
         return true;
+    }
+
+    void redRed(INode<T, V> node) {
+
+        if (node == root) {
+            node.setColor(INode.BLACK);
+            return;
+        }
+
+        INode<T, V> parent = node.getParent(), grandParent = node.getParent().getParent();
+        INode<T, V> uncle = getBrother(node.getParent());
+
+        if (parent.getColor() != INode.BLACK) {
+            if(uncle != null && uncle.getColor() == INode.RED){
+
+                parent.setColor(INode.BLACK);
+                uncle.setColor(INode.BLACK);
+                grandParent.setColor(INode.RED);
+                redRed(grandParent);
+            }
+            else {
+                if(isLeftChild(parent)){
+                    // Left right case
+                    if (isLeftChild(node)) {
+                        swapColors(parent, grandParent);
+                    }
+                    else {
+                        leftRotate(parent);
+                        swapColors(node, grandParent);
+                    }
+                    rightRotate(grandParent);
+                }
+                else {
+                    // Right left case
+                    if (isLeftChild(node)) {
+                        rightRotate(parent);
+                        swapColors(node, grandParent);
+                    }
+                    else {
+                        swapColors(parent, grandParent);
+                    }
+                    leftRotate(grandParent);
+                }
+            }
+        }
     }
 
     // Fix double black problem at a node
@@ -361,17 +356,29 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 
     private INode<T, V> findNode(INode<T, V> root, T key) {
 
-        if (root == null) return null;
-
-        if (key.compareTo(root.getKey()) > 0) {
-            return findNode(root.getRightChild(), key);
+        INode<T, V> tmp = root;
+        while (tmp != null) {
+            if (key.compareTo(tmp.getKey()) > 0) {
+                if (tmp.getRightChild() == null) {
+                    break;
+                }
+                else {
+                    tmp = tmp.getRightChild();
+                }
+            }
+            else if (key.compareTo(tmp.getKey()) < 0) {
+                if (tmp.getLeftChild() == null) {
+                    break;
+                }
+                else {
+                    tmp = tmp.getLeftChild();
+                }
+            }
+            else {
+                break;
+            }
         }
-        else if (key.compareTo(root.getKey()) < 0) {
-            return findNode(root.getLeftChild(), key);
-        }
-        else {
-            return root;
-        }
+        return tmp;
     }
 
     private INode<T, V> findReplace(INode<T, V> node) {
@@ -398,6 +405,8 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
     }
 
     private INode<T, V> getBrother(INode<T, V> node) {
+
+        if (node.getParent() == null) return null;
 
         if (node.getParent().getLeftChild() == node) {
             return node.getParent().getRightChild();
@@ -430,6 +439,12 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
         nodeReplace.setValue(node.getValue());
         node.setKey(tmpKey);
         node.setValue(tmpVal);
+    }
+
+    private void swapColors(INode<T, V> x, INode<T, V> y) {
+        boolean tmp = x.getColor();
+        x.setColor(y.getColor());
+        y.setColor(tmp);
     }
 
     private boolean hasRedChild(INode<T, V> node) {
