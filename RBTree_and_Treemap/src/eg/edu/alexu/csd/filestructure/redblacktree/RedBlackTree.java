@@ -3,11 +3,9 @@ package eg.edu.alexu.csd.filestructure.redblacktree;
 public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T, V> {
 
     INode<T, V> root;
-    int size;
 
     public RedBlackTree() {
         root = null;
-        size = 0;
     }
 
     @Override
@@ -17,22 +15,29 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 
     @Override
     public boolean isEmpty() {
-        return size == 0;
+        return root == null;
     }
 
     @Override
     public void clear() {
-
+        root = null;
     }
 
     @Override
     public V search(T key) {
-        return null;
+
+        INode<T, V> node = findNode(root, key);
+        if (node != null) {
+            return node.getValue();
+        }
+        else {
+            return null;
+        }
     }
 
     @Override
     public boolean contains(T key) {
-        return false;
+        return findNode(root, key) != null;
     }
 
     @Override
@@ -263,7 +268,7 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 
     private INode<T, V> findNode(INode<T, V> root, T key) {
 
-        if (root == null) return root;
+        if (root == null) return null;
 
         if (key.compareTo(root.getKey()) > 0) {
             return findNode(root.getRightChild(), key);
