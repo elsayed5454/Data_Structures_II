@@ -124,6 +124,7 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
         return true;
     }
 
+    // Fix double black problem at a node
     void doubleBlack(INode<T, V> node) {
 
         // Base case
@@ -198,6 +199,66 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
                 }
             }
         }
+    }
+
+    // Left rotate a node
+    private void leftRotate(INode<T, V> node) {
+
+        // The right child will be the new parent
+        INode<T, V> newParent = node.getRightChild();
+
+        // Change root if current node is root
+        if (node == root) {
+            root = newParent;
+        }
+
+        if (node.getParent() != null) {
+            if (isLeftChild(node)) {
+                node.getParent().setLeftChild(newParent);
+            }
+            else {
+                node.getParent().setRightChild(newParent);
+            }
+        }
+        newParent.setParent(node.getParent());
+        node.setParent(newParent);
+
+        node.setRightChild(newParent.getLeftChild());
+
+        if (newParent.getLeftChild() != null) {
+            newParent.getLeftChild().setParent(node);
+        }
+        newParent.setLeftChild(node);
+    }
+
+    // Right rotate a node
+    private void rightRotate(INode<T, V> node) {
+
+        // The right child will be the new parent
+        INode<T, V> newParent = node.getLeftChild();
+
+        // Change root if current node is root
+        if (node == root) {
+            root = newParent;
+        }
+
+        if (node.getParent() != null) {
+            if (isLeftChild(node)) {
+                node.getParent().setLeftChild(newParent);
+            }
+            else {
+                node.getParent().setRightChild(newParent);
+            }
+        }
+        newParent.setParent(node.getParent());
+        node.setParent(newParent);
+
+        node.setLeftChild(newParent.getRightChild());
+
+        if (newParent.getRightChild() != null) {
+            newParent.getRightChild().setParent(node);
+        }
+        newParent.setRightChild(node);
     }
 
     private INode<T, V> findNode(INode<T, V> root, T key) {
