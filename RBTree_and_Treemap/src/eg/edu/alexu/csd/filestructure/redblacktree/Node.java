@@ -5,13 +5,23 @@ public class Node<T extends Comparable<T>, V> implements INode<T, V> {
     private T key;
     private V value;
     private INode<T, V> parent, leftChild, rightChild;
-    private boolean color;
+    private boolean color, Null;
 
     public Node(T newKey, V newValue) {
         key = newKey;
         value = newValue;
         parent = leftChild = rightChild = null;
         color = RED;
+        Null = false;
+    }
+
+    // Constructor for null node with black color
+    public Node(boolean newNull) {
+        Null = newNull;
+        color = BLACK;
+        key = null;
+        value = null;
+        parent = leftChild = rightChild = null;
     }
 
     @Override
@@ -76,6 +86,6 @@ public class Node<T extends Comparable<T>, V> implements INode<T, V> {
 
     @Override
     public boolean isNull() {
-        return false;
+        return Null;
     }
 }
