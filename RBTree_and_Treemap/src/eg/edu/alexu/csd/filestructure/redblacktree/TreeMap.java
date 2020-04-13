@@ -8,35 +8,39 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
-final class MyEntry<K, V> implements Map.Entry<K, V> {
-    private final K key;
-    private V value;
-
-    public MyEntry(K key, V value) {
-        this.key = key;
-        this.value = value;
-    }
-
-    @Override
-    public K getKey() {
-        return key;
-    }
-
-    @Override
-    public V getValue() {
-        return value;
-    }
-
-    @Override
-    public V setValue(V value) {
-        V old = this.value;
-        this.value = value;
-        return old;
-    }
-}
 
 
 public class TreeMap<T extends Comparable<T>, V> implements ITreeMap<T, V> {
+
+    final class MyEntry<K, V> implements Map.Entry<K, V> {
+        private final K key;
+        private V value;
+
+        public MyEntry(K key, V value) {
+            this.key = key;
+            this.value = value;
+        }
+
+        @Override
+        public K getKey() {
+            return key;
+        }
+
+        @Override
+        public V getValue() {
+            return value;
+        }
+
+        @Override
+        public V setValue(V value) {
+            V old = this.value;
+            this.value = value;
+            return old;
+        }
+    }
+
+
+
     IRedBlackTree<T, V> map= new RedBlackTree();
     // Null node with black color
     private final INode<T, V> nil = new Node<>(true);
@@ -140,12 +144,27 @@ public class TreeMap<T extends Comparable<T>, V> implements ITreeMap<T, V> {
 
     @Override
     public Map.Entry<T, V> firstEntry() {
-        return null;
+        INode<T,V> t=map.getRoot();
+        if(t==null||t==nil||map.isEmpty()){
+            System.out.println("hiiii");
+            return null;
+        }
+        while(t.getLeftChild().getKey()!=null&&t.getLeftChild().getKey()!=nil&&t.getLeftChild().getValue()!=null&&t.getLeftChild().getValue()!=nil){
+            t=t.getLeftChild();
+            System.out.println("holaaaa");
+        }
+
+        System.out.println(t.getKey());
+        System.out.println(t.getValue());
+        return new MyEntry<T, V>(t.getKey(),t.getValue());
     }
 
     @Override
     public T firstKey() {
-        return null;
+        if(firstEntry()==null) {
+            return null;
+        }
+        return firstEntry().getKey();
     }
 
     @Override
