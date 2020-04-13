@@ -49,6 +49,14 @@ public class TreeMap<T extends Comparable<T>, V> implements ITreeMap<T, V> {
         }
         return false;
     }
+    private boolean isRightChild (INode<T, V> child){
+        if(child.getParent()!=null&&child.getParent()!=nil){
+            if(child.getParent().getRightChild()==child){
+                return true;
+            }
+        }
+        return false;
+    }
     private INode<T, V> findNode(T key) {
         INode<T, V> temp = map.getRoot();
         while (temp != nil) {
@@ -142,11 +150,33 @@ public class TreeMap<T extends Comparable<T>, V> implements ITreeMap<T, V> {
 
     @Override
     public Map.Entry<T, V> floorEntry(T key) {
+        if (key == null) {
+            throw new RuntimeErrorException(new Error());
+        }
+        INode<T, V> temp= findNode(key);
+        if(temp==null||temp==nil){
+            return null;
+        }
+        if(temp.getKey().compareTo(key)>=0){
+            return  new MyEntry<T, V>(temp.getKey(), temp.getValue());
+        }
+        while(temp!=null&&temp!=nil){
+            if(isRightChild(temp)){
+                return new MyEntry<T, V>(temp.getParent().getKey(), temp.getParent().getValue()) ;
+            }
+            temp=temp.getParent();
+        }
         return null;
     }
 
     @Override
     public T floorKey(T key) {
+        if (key == null) {
+            throw new RuntimeErrorException(new Error());
+        }
+        if(!(floorEntry(key)==null)){
+            return floorEntry(key).getKey();
+        }
         return null;
     }
 
