@@ -253,6 +253,7 @@ public class UnitTest {
 				redBlackTree.insert(key, "toto" + key);
 			}
 			for (int i = 0; i < keysToSearch.size(); i++) {
+				System.out.println(i);
 				boolean ans = redBlackTree.contains(keysToSearch.get(i));
 				Assert.assertEquals(true, ans);				
 			}

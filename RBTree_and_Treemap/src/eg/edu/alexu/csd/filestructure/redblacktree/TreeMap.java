@@ -1,29 +1,123 @@
 package eg.edu.alexu.csd.filestructure.redblacktree;
 
+import com.sun.corba.se.spi.protocol.InitialServerRequestDispatcher;
+
+import javax.management.RuntimeErrorException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
+final class MyEntry<K, V> implements Map.Entry<K, V> {
+    private final K key;
+    private V value;
+
+    public MyEntry(K key, V value) {
+        this.key = key;
+        this.value = value;
+    }
+
+    @Override
+    public K getKey() {
+        return key;
+    }
+
+    @Override
+    public V getValue() {
+        return value;
+    }
+
+    @Override
+    public V setValue(V value) {
+        V old = this.value;
+        this.value = value;
+        return old;
+    }
+}
+
+
 public class TreeMap<T extends Comparable<T>, V> implements ITreeMap<T, V> {
+    IRedBlackTree<T, V> map= new RedBlackTree();
+    // Null node with black color
+    private final INode<T, V> nil = new Node<>(true);
+
+    private boolean isLeftChild (INode<T, V> child){
+        if(child.getParent()!=null&&child.getParent()!=nil){
+            if(child.getParent().getLeftChild()==child){
+                return true;
+            }
+        }
+        return false;
+    }
+    private INode<T, V> findNode(T key) {
+        INode<T, V> temp = map.getRoot();
+        while (temp != nil) {
+            if (key.compareTo(temp.getKey()) > 0) {
+                if (temp.getRightChild().isNull()) {
+                    break;
+                }
+                else {
+                    temp = temp.getRightChild();
+                }
+            }
+            else if (key.compareTo(temp.getKey()) < 0) {
+                if (temp.getLeftChild().isNull()) {
+                    break;
+                }
+                else {
+                    temp = temp.getLeftChild();
+                }
+            }
+            else {
+                break;
+            }
+        }
+        return temp;
+    }
+
+
+
+
     @Override
     public Map.Entry<T, V> ceilingEntry(T key) {
+        if (key == null) {
+            throw new RuntimeErrorException(new Error());
+        }
+        INode<T, V> temp= findNode(key);
+        if(temp==null||temp==nil){
+            return null;
+        }
+        if(temp.getKey().compareTo(key)<=0){
+            return  new MyEntry<T, V>(temp.getKey(), temp.getValue());
+        }
+        while(temp!=null&&temp!=nil){
+            if(isLeftChild(temp)){
+                return new MyEntry<T, V>(temp.getParent().getKey(), temp.getParent().getValue()) ;
+            }
+            temp=temp.getParent();
+        }
         return null;
     }
 
     @Override
     public T ceilingKey(T key) {
+        if (key == null) {
+            throw new RuntimeErrorException(new Error());
+        }
+        if(!(ceilingEntry(key)==null)){
+            return ceilingEntry(key).getKey();
+        }
         return null;
     }
 
     @Override
     public void clear() {
-
+        map.clear();
     }
 
     @Override
     public boolean containsKey(T key) {
-        return false;
+        return map.contains(key);
     }
 
     @Override
@@ -58,7 +152,11 @@ public class TreeMap<T extends Comparable<T>, V> implements ITreeMap<T, V> {
 
     @Override
     public V get(T key) {
-        return null;
+        if (key == null) {
+            throw new RuntimeErrorException(new Error());
+        }
+
+        return map.search(key);
     }
 
     @Override
@@ -98,17 +196,23 @@ public class TreeMap<T extends Comparable<T>, V> implements ITreeMap<T, V> {
 
     @Override
     public void put(T key, V value) {
-
+        map.insert(key,value);
     }
 
     @Override
     public void putAll(Map<T, V> map) {
 
+        for (Map.Entry<T,V> entry : map.entrySet()){
+            put(entry.getKey(),entry.getValue());
+        }
+
     }
 
     @Override
     public boolean remove(T key) {
-        return false;
+
+        return map.delete(key);
+
     }
 
     @Override
