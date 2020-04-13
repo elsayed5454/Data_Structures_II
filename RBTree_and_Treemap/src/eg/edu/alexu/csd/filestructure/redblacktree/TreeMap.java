@@ -146,16 +146,11 @@ public class TreeMap<T extends Comparable<T>, V> implements ITreeMap<T, V> {
     public Map.Entry<T, V> firstEntry() {
         INode<T,V> t=map.getRoot();
         if(t==null||t==nil||map.isEmpty()){
-            System.out.println("hiiii");
             return null;
         }
         while(t.getLeftChild().getKey()!=null&&t.getLeftChild().getKey()!=nil&&t.getLeftChild().getValue()!=null&&t.getLeftChild().getValue()!=nil){
             t=t.getLeftChild();
-            System.out.println("holaaaa");
         }
-
-        System.out.println(t.getKey());
-        System.out.println(t.getValue());
         return new MyEntry<T, V>(t.getKey(),t.getValue());
     }
 
@@ -225,12 +220,22 @@ public class TreeMap<T extends Comparable<T>, V> implements ITreeMap<T, V> {
 
     @Override
     public Map.Entry<T, V> lastEntry() {
-        return null;
+        INode<T,V> t=map.getRoot();
+        if(t==null||t==nil||map.isEmpty()){
+            return null;
+        }
+        while(t.getRightChild().getKey()!=null&&t.getRightChild().getKey()!=nil&&t.getRightChild().getValue()!=null&&t.getRightChild().getValue()!=nil){
+            t=t.getRightChild();
+        }
+        return new MyEntry<T, V>(t.getKey(),t.getValue());
     }
 
     @Override
     public T lastKey() {
-        return null;
+        if(lastEntry()==null) {
+            return null;
+        }
+        return lastEntry().getKey();
     }
 
     @Override
