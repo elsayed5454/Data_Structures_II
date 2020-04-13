@@ -202,6 +202,10 @@ public class TreeMap<T extends Comparable<T>, V> implements ITreeMap<T, V> {
     @Override
     public void putAll(Map<T, V> map) {
 
+        if (map == null) {
+            throw new RuntimeErrorException(new Error());
+        }
+
         for (Map.Entry<T,V> entry : map.entrySet()){
             put(entry.getKey(),entry.getValue());
         }
@@ -211,6 +215,9 @@ public class TreeMap<T extends Comparable<T>, V> implements ITreeMap<T, V> {
     @Override
     public boolean remove(T key) {
 
+        if(!containsKey(key)){
+            return false;
+        }
         return map.delete(key);
 
     }
