@@ -150,7 +150,10 @@ public class TreeMap<T extends Comparable<T>, V> implements ITreeMap<T, V> {
 
     @Override
     public boolean containsValue(V value) {
-        return false;
+        if (value == null) {
+            throw new RuntimeErrorException(new Error());
+        }
+        return values().contains(value);
     }
 
     @Override
@@ -324,6 +327,7 @@ public class TreeMap<T extends Comparable<T>, V> implements ITreeMap<T, V> {
 
     @Override
     public Collection<V> values() {
+        list.clear();
         InorderTraversal(map.getRoot());
         ArrayList<V> valueList= new ArrayList<V>();
         for( int i=0 ; i< list.size();i++){
