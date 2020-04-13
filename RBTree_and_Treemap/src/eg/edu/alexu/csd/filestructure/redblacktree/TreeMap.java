@@ -3,11 +3,7 @@ package eg.edu.alexu.csd.filestructure.redblacktree;
 import com.sun.corba.se.spi.protocol.InitialServerRequestDispatcher;
 
 import javax.management.RuntimeErrorException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
-
+import java.util.*;
 
 
 public class TreeMap<T extends Comparable<T>, V> implements ITreeMap<T, V> {
@@ -44,6 +40,26 @@ public class TreeMap<T extends Comparable<T>, V> implements ITreeMap<T, V> {
     IRedBlackTree<T, V> map= new RedBlackTree();
     // Null node with black color
     private final INode<T, V> nil = new Node<>(true);
+    ArrayList<Map.Entry<T,V>> list= new ArrayList<Map.Entry<T,V>>();
+
+
+    void InorderTraversal(INode<T, V> node)
+    {
+        if ((node.getKey()==null)&&(node.getValue()==null)&&(node.getLeftChild()==null)&&(node.getRightChild()==null)) {
+
+            return;
+        }
+
+        /* first recur on left child */
+        InorderTraversal(node.getLeftChild());
+
+        /* add the data of node to set */
+        list.add(new AbstractMap.SimpleEntry<>((T)node.getKey(),(V)node.getValue()));
+
+        /* now recur on right child */
+        InorderTraversal(node.getRightChild());
+    }
+
 
     private boolean isLeftChild (INode<T, V> child){
         if(child.getParent()!=null&&child.getParent()!=nil){
@@ -139,7 +155,12 @@ public class TreeMap<T extends Comparable<T>, V> implements ITreeMap<T, V> {
 
     @Override
     public Set<Map.Entry<T, V>> entrySet() {
-        return null;
+        InorderTraversal(map.getRoot());
+        Set<Map.Entry<T, V>> orderedSet=new LinkedHashSet<>(list);
+        Iterator<Map.Entry<T, V>> itr1 = orderedSet.iterator();
+        itr1.next();
+        System.out.println(itr1);
+        return orderedSet;
     }
 
     @Override
@@ -215,7 +236,13 @@ public class TreeMap<T extends Comparable<T>, V> implements ITreeMap<T, V> {
 
     @Override
     public Set<T> keySet() {
-        return null;
+        InorderTraversal(map.getRoot());
+        ArrayList<T> keyList= new ArrayList<T>();
+        for( int i=0 ; i< list.size();i++){
+            keyList.add(list.get(i).getKey());
+        }
+        Set<T> keySet=new LinkedHashSet<T>(keyList);
+        return keySet;
     }
 
     @Override
@@ -240,12 +267,24 @@ public class TreeMap<T extends Comparable<T>, V> implements ITreeMap<T, V> {
 
     @Override
     public Map.Entry<T, V> pollFirstEntry() {
-        return null;
+        if(map.isEmpty()){
+            return null;
+        }
+        Map.Entry<T,V> temp=firstEntry();
+        T tempKey=firstKey();
+        remove(tempKey);
+        return temp;
     }
 
     @Override
     public Map.Entry<T, V> pollLastEntry() {
-        return null;
+        if(map.isEmpty()){
+            return null;
+        }
+        Map.Entry<T,V> temp=lastEntry();
+        T tempKey=lastKey();
+        remove(tempKey);
+        return temp;
     }
 
     @Override
@@ -278,11 +317,18 @@ public class TreeMap<T extends Comparable<T>, V> implements ITreeMap<T, V> {
 
     @Override
     public int size() {
-        return 0;
+        list.clear();
+        InorderTraversal(map.getRoot());
+        return list.size();
     }
 
     @Override
     public Collection<V> values() {
-        return null;
+        InorderTraversal(map.getRoot());
+        ArrayList<V> valueList= new ArrayList<V>();
+        for( int i=0 ; i< list.size();i++){
+            valueList.add(list.get(i).getValue());
+        }
+        return valueList;
     }
 }
