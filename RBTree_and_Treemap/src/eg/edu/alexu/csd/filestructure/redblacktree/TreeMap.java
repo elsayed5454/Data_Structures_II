@@ -229,12 +229,33 @@ public class TreeMap<T extends Comparable<T>, V> implements ITreeMap<T, V> {
 
     @Override
     public ArrayList<Map.Entry<T, V>> headMap(T toKey) {
-        return null;
+        if (toKey == null) {
+            throw new RuntimeErrorException(new Error());
+        }
+        list.clear();
+        InorderTraversal(map.getRoot());
+        if(!list.contains(toKey)){
+            return new ArrayList<>();
+        }
+        ArrayList<Map.Entry<T, V>> sList = new ArrayList<Map.Entry<T, V>> (list.subList(0,list.indexOf(toKey)-1));
+        return sList;
     }
 
     @Override
     public ArrayList<Map.Entry<T, V>> headMap(T toKey, boolean inclusive) {
-        return null;
+        if(inclusive){
+            if (toKey == null) {
+                throw new RuntimeErrorException(new Error());
+            }
+            list.clear();
+            InorderTraversal(map.getRoot());
+            if(!list.contains(toKey)){
+                return new ArrayList<>();
+            }
+            ArrayList<Map.Entry<T, V>> sList = new ArrayList<Map.Entry<T, V>> (list.subList(0,list.indexOf(toKey)));
+            return sList;
+        }
+        return headMap(toKey);
     }
 
     @Override
